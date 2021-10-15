@@ -27,14 +27,14 @@ xgb_model  = joblib.load(xgb_model_path)
 
 
 def feature_engineering(df):
-    #Total income
-    df['TotalIncome'] = df['ApplicantIncome']  + df['CoapplicantIncome']
-    #the monthly amount to be paid
-    df['monthly_amount'] = df['LoanAmount']/df['Loan_Amount_Term']
-    #the income left after the monthly amount has been paid
-    df['left_income'] = df['TotalIncome'] - df['monthly_amount']*1000
+   #Total income
+   df['TotalIncome'] = df['ApplicantIncome']  + df['CoapplicantIncome']
+   #the monthly amount to be paid
+   df['monthly_amount'] = df['LoanAmount']/df['Loan_Amount_Term']
+   #the income left after the monthly amount has been paid
+   df['left_income'] = df['TotalIncome'] - df['monthly_amount']*1000
 
-    return df
+   return df
 
 
 def one_hot_encoding(df):
@@ -42,7 +42,7 @@ def one_hot_encoding(df):
    new_dict = {}
    for col in model_features:
       if col not in df.columns:
-           new_dict[col] = 0
+         new_dict[col] = 0
       else:
          new_dict[col] = df[col]
    df = pd.DataFrame(new_dict)
@@ -58,22 +58,22 @@ def modeling(df):
 
 def submit_form(request):
 
-    if request.method == "POST":
-       form = ApprovalForm(request.POST)
-       if form.is_valid():
-           row = {}
-           for col in model_default_columns:
-              row[col] = form.cleaned_data[col]
-           
-           df = pd.DataFrame(row,columns=model_default_columns,index=[0])
+   if request.method == "POST":
+      form = ApprovalForm(request.POST)
+      if form.is_valid():
+         row = {}
+         for col in model_default_columns:
+            row[col] = form.cleaned_data[col]
+         
+         df = pd.DataFrame(row,columns=model_default_columns,index=[0])
 
-           model_out  = modeling(one_hot_encoding(feature_engineering(df)))
-           if model_out == 1:
-              answer = 'Approved'
-           else:
-              answer = 'Rejected'
-           messages.success(request,'Application Status: {}'.format(answer))
-    else:
-       form = ApprovalForm()
-    return render(request,'main/form.html',{"form":form})
-    
+         model_out  = modeling(one_hot_encoding(feature_engineering(df)))
+         if model_out == 1:
+            answer = 'Approved'
+         else:
+            answer = 'Rejected'
+         messages.success(request,'Application Status: {}'.format(answer))
+   else:
+      form = ApprovalForm()
+   return render(request,'main/form.html',{"form":form})
+   
