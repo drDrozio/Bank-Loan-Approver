@@ -1,2 +1,1 @@
-web: python manage.py collectstatic --no-input;
-web: gunicorn django_environment.wsgi
+web: gunicorn django_enviornment.wsgi
